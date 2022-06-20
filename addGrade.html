@@ -1,0 +1,92 @@
+<html>
+
+<head>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <h1>Add a new Grade</h1>
+
+    <!-- Setting the Date input with the minimum date condition  -->
+    <h3>Date:</h3>
+    <div class="input">
+        <input type="date" min='1900-01-01' id="date"><br><br>
+    </div>
+
+    <!-- Setting the Grade input with the min and max conditions  -->
+    <h3>Grade:</h3>
+    <div class="input">
+        <input type="number" min="0" max="100" id="grade" style="text-align:center"><br><br>
+    </div><br>
+
+    <!-- Setting the button inputs "Go Back" and "Add Grade"  -->
+    <div style="display: flex;justify-content: center;">
+        <button style="background-color: gainsboro; color: black; font-weight: 100;" onclick="moveToSomewhereElse()">Go
+            Back</button>&nbsp;&nbsp;
+        <button onclick="createGrade()">Add Grade</button>
+    </div>
+
+    <script>
+
+        /* Getting the right format for the date and calling
+         today's date as well, that I will set as the maximum date that
+         the user can enter a new grade in. */
+
+        let today = new Date();
+        let dd = today.getDate();
+        let mm = today.getMonth() + 1; // January is 0
+        let yyyy = today.getFullYear();
+
+        if (dd < 10) {
+            dd = '0' + dd;
+        }
+        if (mm < 10) {
+            mm = '0' + mm;
+        }
+        today = yyyy + '-' + mm + '-' + dd;
+        document.getElementById("date").setAttribute("max", today);
+
+        // Getting the user's id from session storage
+        let id = sessionStorage.getItem("id")
+
+        // Creating the function for adding grades
+        async function createGrade() {
+
+            //  Getting the date and the grade inputs, validating that they contain data
+            let date = document.getElementById("date").value;
+            let grade = document.getElementById("grade").value;
+            if (date == "" || grade == "") {
+                alert("Make sure all data is filled correctly")
+                return false
+            }
+
+            // Fetching the desired id and pushing the new grade to the array
+            let data;
+
+            let resp = await fetch(`http://localhost:8000/students/${id}`);
+            if (resp.ok) {
+                data = await resp.json();
+                data.grades.push({ date, grade });
+            }
+
+            let resp2 = await fetch(`http://localhost:8000/students/${id}`, {
+                method: "put",
+                body: JSON.stringify(data),
+                headers: { "content-type": "application/json" },
+            });
+            location.href = "studentGrades.html"
+        }
+
+        // the function of the "Go Back" button
+        function moveToSomewhereElse() {
+            location.href = "studentGrades.html"
+        }
+
+
+    </script>
+
+
+</body>
+
+</html>

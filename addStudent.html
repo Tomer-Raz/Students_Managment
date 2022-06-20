@@ -1,0 +1,141 @@
+<html>
+
+<head>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <h1>Add a new student</h1>
+
+    <!-- Setting the Name input  -->
+    <h3>Name:</h3>
+    <div class="input">
+        <input type="text" id="fullName" placeholder="Enter Name" style="text-align: center;"><br><br>
+    </div>
+
+    <!-- Setting the Email input  -->
+    <h3>Email:</h3>
+    <div class="input">
+        <input type="email" id="email" placeholder="Enter email" style="text-align:center"><br><br>
+    </div><br>
+
+    <!-- Setting the Faculty input  -->
+    <h3>Faculty:</h3>
+    <div class="input">
+        <input type="text" id="faculty" placeholder="Enter Faculty" style="text-align:center; width: 16%;"><br><br>
+    </div><br>
+
+    <!-- Setting the Date input  -->
+    <h3>Date of Birth:</h3>
+    <div class="input">
+        <input type="date" min='1920-01-01' id="birthDate" placeholder="Enter Date of Birth"
+            style="text-align:center; width: 16%;"><br><br>
+    </div><br>
+
+    <!-- Setting the buttons  -->
+    <div style="display: flex;justify-content: center;">
+        <button style="background-color: gainsboro; color: black; font-weight: 100;" onclick="moveToSomewhereElse()">Go
+            Back</button>&nbsp;&nbsp;
+        <button onclick="addStudent()">Add Student</button>
+    </div>
+
+    <script>
+
+        // Setting an Email format validation and alerting if the input is wrong
+        function ValidateEmail(mail) {
+            if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(mail.value)) {
+                return (true)
+            } else {
+                alert("You have entered an invalid email address!")
+                return (false)
+            }
+        }
+
+        // Setting a Name format validation and alerting if the input is wrong
+        function ValidateName(name) {
+            if (/^[ a-zA-Z\-\’]+$/.test(name.value)) {
+                return (true)
+            } else {
+                alert("You have entered an invalid name!")
+                return (false)
+            }
+        }
+
+        // Setting the same format validation  
+        function ValidateFaculty(faculty) {
+            if (/^[ a-zA-Z\-\’]+$/.test(faculty.value)) {
+                return (true)
+            } else {
+                alert("You have entered an invalid faculty!")
+                return (false)
+            }
+        }
+
+        /* Getting the right format for the date and calling
+        today's date as well, that I will set as the maximum date that
+        the user can enter a new grade in. */
+
+        let today = new Date();
+        let dd = today.getDate();
+        let mm = today.getMonth() + 1; // January is 0
+        let yyyy = today.getFullYear();
+
+        if (dd < 10) {
+            dd = '0' + dd;
+        }
+
+        if (mm < 10) {
+            mm = '0' + mm;
+        }
+
+        today = yyyy + '-' + mm + '-' + dd;
+        document.getElementById("birthDate").setAttribute("max", today);
+
+        // Creating the function for adding grades
+        async function addStudent() {
+            let fullNameEl = document.getElementById("fullName");
+            let emailEl = document.getElementById("email");
+            let facultyEl = document.getElementById("faculty");
+            let birthDateEl = document.getElementById("birthDate");
+
+            // Checking if the data is filled accordingly
+            if (fullNameEl.value == "" || emailEl.value == "" || facultyEl.value == "" || birthDateEl.value == "") {
+                alert("Make sure all data is filled correctly")
+
+                // Intoducing input validations
+            } else if (ValidateEmail(emailEl) === false) {
+            } else if (ValidateName(fullNameEl) === false) {
+            } else if (ValidateFaculty(facultyEl) === false) {
+            } else {
+                let student = {
+                    fullName: fullNameEl.value,
+                    email: emailEl.value,
+                    faculty: facultyEl.value,
+                    birthDate: birthDateEl.value,
+                }
+                let resp = await fetch("http://localhost:8000/students", {
+                    method: 'post',
+                    body: JSON.stringify(student),
+                    headers: { "Content-type": "application/json" }
+                });
+                location.href = 'students.html';
+            }
+            if (resp.ok) {
+                let data = await resp.json();
+            }
+            else {
+                console.log("error");
+            }
+        }
+
+        // the function of the "Go Back" button
+
+        function moveToSomewhereElse() {
+            location.href = "students.html"
+        }
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,74 @@
+<html>
+
+<head>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body onload="getGrade()">
+
+    <h1>Edit Grade</h1>
+
+    <!-- Setting the Grade input with some conditions  -->
+    <h3>Grade:</h3>
+    <div class="input">
+        <input type="number" min="0" max="100" id="grade" style="text-align:center"><br><br>
+    </div><br>
+
+    <!-- Setting the button inputs -->
+    <div style="display: flex;justify-content: center;">
+        <button style="background-color: gainsboro; color: black; font-weight: 100;" onclick="moveToSomewhereElse()">Go
+            Back</button>&nbsp;&nbsp;
+        <button onclick="changeGrade(id2,x)">Update</button>
+    </div>
+
+    <script>
+
+        // Getting the relevant items
+        let id = sessionStorage.getItem("id")
+        let id2 = sessionStorage.getItem("id2")
+        let x = document.getElementById("grade");
+
+        // Creating the function that will display the grade inside the input
+        async function getGrade() {
+            let data;
+            let resp = await fetch(`http://localhost:8000/students/${id}`);
+            if (resp.ok) {
+                data = await resp.json();
+                data.grades.forEach((element) => {
+                    if (element._id == id2) {
+                        x.value = element.grade
+                    }
+                })
+            }
+        }
+
+        // Creating the function for the grade update
+        async function changeGrade(id2, x) {
+            let data;
+            let resp = await fetch(`http://localhost:8000/students/${id}`);
+            if (resp.ok) {
+                data = await resp.json();
+                let grades = data.grades;
+                grades.forEach((element) => {
+                    if (element._id == id2) {
+                        element.grade = x.value;
+                    }
+                });
+            }
+
+            let resp2 = await fetch(`http://localhost:8000/students/${id}`, {
+                method: "put",
+                body: JSON.stringify(data),
+                headers: { "content-type": "application/json" },
+            });
+            location.href = "studentGrades.html"
+        }
+        function moveToSomewhereElse() {
+            location.href = "studentGrades.html"
+        }
+
+    </script>
+
+</body>
+
+</html>

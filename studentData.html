@@ -1,0 +1,81 @@
+<html>
+
+<head>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body onload="getById()">
+
+    <h1>Student Data</h1>
+
+    <!-- Setting the Name span  -->
+    <h3>Full Name:</h3>
+    <div class="input">
+        <span id="fullName" style="text-align: center;"></span><br>
+    </div>
+
+    <!-- Setting the Email span  -->
+    <h3>Email:</h3>
+    <div class="input">
+        <span id="email" style="text-align:center"></span><br>
+    </div>
+
+    <!-- Setting the Faculty span  -->
+    <h3>Faculty:</h3>
+    <div class="input">
+        <span id="faculty" style="text-align:center; width: 16%;"></span><br>
+    </div>
+
+    <!-- Setting the Date span  -->
+    <h3>Date of Birth:</h3>
+    <div class="input">
+        <span id="birthDate" style="text-align:center; width: 16%;"></span><br>
+    </div><br><br>
+
+    <!-- Setting the buttons  -->
+    <div style="display: flex;justify-content: center;">
+        <button style="background-color: gainsboro; color: black; font-weight: 100;" onclick="moveToSomewhereElse()">Go
+            Back</button>
+    </div>
+
+    <script>
+        let id = sessionStorage.getItem("id")
+
+        // Creating the function for getting the user's data
+        async function getById() {
+            const resp = await fetch(`http://localhost:8000/students/${id}`)
+            if (resp.ok === true) {
+
+                const user = await resp.json();
+
+                const nameEl = document.getElementById("fullName")
+                nameEl.innerHTML = user.fullName
+
+                const emailEl = document.getElementById("email")
+                emailEl.innerHTML = user.email
+
+                const facultyEl = document.getElementById("faculty")
+                facultyEl.innerHTML = user.faculty
+
+                //Formatting the date
+                const birthDateEl = document.getElementById("birthDate")
+                const d2 = new Date(user.birthDate)
+                let text2 = d2.toLocaleDateString();
+                birthDateEl.innerHTML = (text2)
+
+            } else {
+                console.log("Error");
+            }
+        }
+
+        // the function of the "Go Back" button
+        function moveToSomewhereElse() {
+            location.href = "students.html"
+        }
+
+    </script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,39 @@
+<html>
+
+<head>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<!-- This file is only the structure of the page. -->
+<!-- JS file is "studentsScript.js" -->
+
+<body onload="getStudents()">
+
+    <h1>All Students</h1>
+
+    <!-- Setting the table -->
+    <table border="1" id="table" class="styled-table"
+        style="table-layout: auto; width: 50%;color:white; font-family: Arial, Helvetica, sans-serif;">
+        <thead>
+            <tr>
+                <td><b>Full Name</b></td>
+                <td><b>Faculty</b></td>
+                <td><b></b></td>
+                <td><b></b></td>
+                <td><b></b></td>
+            </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+    </table><br>
+
+    <!-- Setting the button  -->
+    <div style="display: flex;justify-content: center;">
+        <button onclick="moveToAddStudent()">Add Student</button>
+    </div>
+
+    <script src="studentsScript.js"></script>
+
+
+</body>
+
+</html>

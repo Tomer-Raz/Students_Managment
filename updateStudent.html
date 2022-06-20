@@ -1,0 +1,174 @@
+<html>
+
+<head>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body onload="getById()">
+
+    <h1>Edit Student</h1>
+
+    <!-- Setting the Name input  -->
+    <h3>Full Name:</h3>
+    <div class="input">
+        <input type="text" id="fullName" style="text-align: center;"><br><br>
+    </div>
+
+    <!-- Setting the Email input  -->
+    <h3>Email:</h3>
+    <div class="input">
+        <input type="email" id="email" style="text-align:center"><br><br>
+    </div><br>
+
+    <!-- Setting the Faculty input  -->
+    <h3>Faculty:</h3>
+    <div class="input">
+        <input type="text" id="faculty" style="text-align:center; width: 15%;"><br><br>
+    </div><br>
+
+    <!-- Setting the Date input  -->
+    <h3>Date of Birth:</h3>
+    <div class="input">
+        <input type="date" min='1900-01-01' id="birthDate" style="text-align:center; width: 15%;"><br><br>
+    </div><br>
+
+    <!-- Setting the buttons  -->
+    <div style="display: flex;justify-content: center;">
+        <button style="background-color: gainsboro; color: black; font-weight: 100;" onclick="moveToSomewhereElse()">Go
+            Back</button>&nbsp;&nbsp;
+        <button onclick="updateData()">Update</button>
+    </div>
+
+    <script>
+        /* Getting the right format for the date and calling
+        today's date as well, that I will set as the maximum date that
+        the user can enter. */
+
+        let today = new Date();
+        let dd = today.getDate();
+        let mm = today.getMonth() + 1; // January is 0
+        let yyyy = today.getFullYear();
+
+        if (dd < 10) {
+            dd = '0' + dd;
+        }
+        if (mm < 10) {
+            mm = '0' + mm;
+        }
+        today = yyyy + '-' + mm + '-' + dd;
+        document.getElementById("birthDate").setAttribute("max", today);
+
+        // Setting an Email format validation and alerting if the input is wrong
+        function ValidateEmail(mail) {
+            if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(mail.value)) {
+                return (true)
+            } else {
+                alert("You have entered an invalid email address!")
+                return (false)
+            }
+        }
+        // Setting a Name format validation and alerting if the input is wrong
+        function ValidateName(name) {
+            if (/^[ a-zA-Z\-\’]+$/.test(name.value)) {
+                return (true)
+            } else {
+                alert("You have entered an invalid name!")
+                return (false)
+            }
+        }
+        // Setting the same format validation  
+        function ValidateFaculty(faculty) {
+            if (/^[ a-zA-Z\-\’]+$/.test(faculty.value)) {
+                return (true)
+            } else {
+                alert("You have entered an invalid faculty!")
+                return (false)
+            }
+        }
+
+        let id = sessionStorage.getItem("id")
+        let grades = []
+
+        // Creating the function for getting student by id
+
+        async function getById() {
+
+            const resp = await fetch(`http://localhost:8000/students/${id}`)
+            if (resp.ok === true) {
+                const user = await resp.json();
+
+                const nameEl = document.getElementById("fullName").value = user.fullName
+                const emailEl = document.getElementById("email").value = user.email
+                const facultyEl = document.getElementById("faculty").value = user.faculty
+
+                // Getting the date and formatting it
+                const birthDateEl = document.getElementById("birthDate")
+                let MyDate = new Date(user.birthDate)
+                let MyDateString;
+                MyDate.setDate(MyDate.getDate() + 20);
+                MyDateString = MyDate.getFullYear() + '-' + ('0' + (MyDate.getMonth() + 1)).slice(-2) + '-'
+                    + ('0' + MyDate.getDate()).slice(-2)
+                birthDateEl.value = (MyDateString)
+
+                grades = user.grades
+
+            } else {
+                console.log("Error");
+            }
+        }
+
+        // Creating the function for updating the data
+        async function updateData() {
+            const resp = await fetch(`http://localhost:8000/students/${id}`)
+            if (resp.ok === true) {
+                const user = await resp.json();
+
+                let newDate = document.getElementById("birthDate")
+                let newFullName = document.getElementById("fullName")
+                let newEmail = document.getElementById("email")
+                let newFaculty = document.getElementById("faculty")
+
+                let obj = {
+                    fullName: newFullName.value,
+                    email: newEmail.value,
+                    faculty: newFaculty.value,
+                    birthDate: newDate.value,
+                    grades: grades
+                }
+
+                //Few validations here. First of which are to make sure the data is indeed inserted,
+                //The latter regards each input specifically
+                if (newFullName.value == "" || newEmail.value == "" || newFaculty.value == "" || newDate.value == "") {
+                    alert("Make sure all data is filled correctly")
+                } else if (ValidateEmail(newEmail) === false) {
+                } else if (ValidateName(newFullName) === false) {
+                } else if (ValidateFaculty(newFaculty) === false) {
+                } else {
+                    let resp = await fetch(`http://localhost:8000/students/${id}`, {
+                        method: "put",
+                        body: JSON.stringify(obj),
+                        headers: { "Content-type": "application/json" }
+                    })
+
+                    if (resp.ok === true) {
+                        let data = await resp.json()
+                        location.href = "students.html"
+                    } else {
+                        console.log("Error");
+                    }
+                }
+
+            }
+        }
+
+        // the function of the "Go Back" button
+
+        function moveToSomewhereElse() {
+            location.href = "students.html"
+        }
+
+    </script>
+
+</body>
+
+</html>

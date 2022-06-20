@@ -1,0 +1,111 @@
+<html>
+
+<head>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body onload="getGrades()">
+
+    <h1>Student Grades</h1><br>
+
+    <!-- Setting the table -->
+    <table id="table" border="1" class="styled-table"
+        style="table-layout: auto; width: 50%;color:white; font-family: Arial, Helvetica, sans-serif;">
+        <thead>
+            <tr>
+                <td>Date</td>
+                <td>Grade</td>
+                <td></td>
+            </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+    </table><br>
+
+    <!-- Setting the buttons  -->
+    <div style="display: flex;justify-content: center;">
+        <button style="background-color: gainsboro; color: black; font-weight: 100;" onclick="moveToSomewhereElse()">Go
+            Back</button>&nbsp;&nbsp;
+        <button onclick="addGrade()">Add Grade</button>
+    </div>
+
+    <script>
+        let id = sessionStorage.getItem("id");
+        let tableEl = document.getElementById("table");
+        let tbodyEl = document.getElementById("tbody");
+
+        // Creating the function for getting grades
+        async function getGrades() {
+            const resp = await fetch(`http://localhost:8000/students/${id}`)
+            if (resp.ok === true) {
+                const user = await resp.json();
+
+                //Checking if the user has any grades.
+                //If not, the table will present a text mentioning that.
+                //I thought about an alert message instead, but come on this is much cooler
+                if (user.grades == "") {
+
+                    let errorTr = document.createElement("tr")
+                    let errorTd = document.createElement("td")
+                    let errorTd2 = document.createElement("td")
+                    errorTr.innerHTML = "This user has no grades"
+                    errorTr.setAttribute("style", "color:Black")
+                    tableEl.appendChild(tbodyEl);
+                    tbodyEl.appendChild(errorTr);
+                    errorTr.appendChild(errorTd);
+                    errorTr.appendChild(errorTd2);
+
+                } else {
+                    for (let i = 0; i < user.grades.length; i++) {
+
+                        let newTr = document.createElement("tr");
+                        tableEl.appendChild(tbodyEl);
+                        tbodyEl.appendChild(newTr);
+
+                        //Formatting the date
+                        let td1El = document.createElement("td");
+                        const date = new Date(user.grades[i].date)
+                        let text = date.toLocaleDateString();
+                        td1El.innerHTML = text;
+
+                        let td2El = document.createElement("td");
+                        let grade = user.grades[i].grade
+                        td2El.innerHTML = grade;
+
+                        let editTd = document.createElement("td");
+                        let editEl = document.createElement("input");
+                        editEl.setAttribute("type", "button")
+                        editEl.setAttribute("value", "Edit")
+                        editEl.addEventListener("click", () => {
+                            sessionStorage.setItem("id", id)
+                            location.href = "editGrade.html";
+                        })
+                        editEl.addEventListener("click", () => {
+                            sessionStorage.setItem("id2", user.grades[i]._id)
+                            location.href = "editGrade.html";
+                        })
+
+                        newTr.appendChild(td1El)
+                        newTr.appendChild(td2El)
+                        newTr.appendChild(editTd)
+                        editTd.appendChild(editEl)
+                    }
+                }
+            } else {
+                console.log("Error");
+            }
+        }
+
+        // the function of the "Go Back" button
+        function moveToSomewhereElse() {
+            location.href = "students.html"
+        }
+
+        // the function of the "Add Grade" button
+        function addGrade() {
+            location.href = "addGrade.html"
+        }
+
+    </script>
+</body>
+
+</html>
